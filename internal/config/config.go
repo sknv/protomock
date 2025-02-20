@@ -20,8 +20,13 @@ type LogConfig struct {
 	Level slog.Level `yaml:"level" envconfig:"LOG_LEVEL"`
 }
 
+type HTTPServerConfig struct {
+	Address string `yaml:"address" envconfig:"HTTP_SERVER_ADDRESS"`
+}
+
 type Config struct {
-	Log LogConfig `yaml:"log"`
+	Log        LogConfig        `yaml:"log"`
+	HTTPServer HTTPServerConfig `yaml:"httpserver"`
 }
 
 func Parse(filePath string) (*Config, error) {

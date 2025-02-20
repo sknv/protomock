@@ -6,6 +6,7 @@ import (
 	"fmt"
 	stdlog "log"
 	"log/slog"
+	"net/http"
 	"time"
 
 	_ "go.uber.org/automaxprocs"
@@ -59,9 +60,16 @@ func run(cfg *config.Config) error {
 func buildApp(_ context.Context, cfg *config.Config) (*container.Application, error) {
 	app := container.NewApplication()
 
+	// Logger.
 	{
 		logger := app.RegisterLogger(log.Config{Level: cfg.Log.Level})
 		slog.SetDefault(logger) // Sets the global default logger.
+	}
+
+	// HTTP server.
+	{
+		router := app.RegisterHTTPServer(cfg.HTTPServer.Address)
+		router.HandleFunc("/", http.NotFound) // Common NotFound handler to enable middleware on all routes.
 	}
 
 	return app, nil

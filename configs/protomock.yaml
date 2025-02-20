@@ -1,2 +1,5 @@
 log:
   level: DEBUG
+
+httpserver:
+  address: ':8000'

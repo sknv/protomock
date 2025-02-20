@@ -12,20 +12,26 @@ import (
 )
 
 type Application struct {
-	closers *closer.Closers
-	logger  option.Option[*slog.Logger]
+	closers    *closer.Closers
+	logger     option.Option[*slog.Logger]
+	httpServer option.Option[*httpServer]
 }
 
 func NewApplication() *Application {
 	return &Application{
-		closers: closer.New(),
-		logger:  option.None[*slog.Logger](),
+		closers:    closer.New(),
+		logger:     option.None[*slog.Logger](),
+		httpServer: option.None[*httpServer](),
 	}
 }
 
 func (a *Application) Run(ctx context.Context) error {
 	logger := a.logger.UnwrapOrElse(slog.Default)
 	logger.InfoContext(ctx, "Starting application...")
+
+	if err := runParallel(ctx, a.runHTTPServer); err != nil {
+		return fmt.Errorf("run components in parallel: %w", err)
+	}
 
 	logger.InfoContext(ctx, "Application started")
 
