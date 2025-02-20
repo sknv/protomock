@@ -1,0 +1,27 @@
+# https://golangci-lint.run/usage/configuration
+
+linters:
+  # Enable all available linters.
+  enable-all: true
+
+  # Disable specific linters.
+  disable:
+    # Deprecated.
+    - tenv
+    # Custom.
+    - depguard
+    - tagalign
+
+linters-settings:
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(github.com/sknv/protomock)
+
+  gofumpt:
+    module-path: github.com/sknv/protomock
+
+issues:
+  # Fix found issues (if it's supported by the linter).
+  fix: false
