@@ -11,6 +11,7 @@ linters:
     # Custom.
     - depguard
     - tagalign
+    - varnamelen
 
 linters-settings:
   gci:

@@ -13,6 +13,7 @@ import (
 
 	"github.com/sknv/protomock/internal/config"
 	"github.com/sknv/protomock/internal/container"
+	"github.com/sknv/protomock/pkg/http/middleware"
 	"github.com/sknv/protomock/pkg/log"
 	"github.com/sknv/protomock/pkg/os"
 )
@@ -61,14 +62,18 @@ func buildApp(_ context.Context, cfg *config.Config) (*container.Application, er
 	app := container.NewApplication()
 
 	// Logger.
-	{
-		logger := app.RegisterLogger(log.Config{Level: cfg.Log.Level})
-		slog.SetDefault(logger) // Sets the global default logger.
-	}
+	logger := app.RegisterLogger(log.Config{Level: cfg.Log.Level})
+	slog.SetDefault(logger) // Sets the global default logger.
 
 	// HTTP server.
 	{
 		router := app.RegisterHTTPServer(cfg.HTTPServer.Address)
+		defaultMiddlewares := middleware.ApplyDefault(middleware.Config{
+			Logger:  logger,
+			Skipper: nil,
+		})
+		router.Use(defaultMiddlewares...)
+
 		router.HandleFunc("/", http.NotFound) // Common NotFound handler to enable middleware on all routes.
 	}
 
