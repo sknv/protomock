@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"fmt"
+	"log/slog"
 
 	"github.com/sknv/protomock/pkg/config"
 )
@@ -16,11 +17,11 @@ func FilePathFlag() *string {
 // ----------------------------------------------------------------------------
 
 type LogConfig struct {
-	Level string `yaml:"level" envconfig:"LOG_LEVEL"`
+	Level slog.Level `yaml:"level" envconfig:"LOG_LEVEL"`
 }
 
 type Config struct {
-	LogConfig LogConfig `yaml:"log"`
+	Log LogConfig `yaml:"log"`
 }
 
 func Parse(filePath string) (*Config, error) {
