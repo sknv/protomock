@@ -71,13 +71,13 @@ func (a *Application) runHTTPServer(ctx context.Context) error {
 
 	// Remember to stop the server.
 	a.closers.Add(func(closeCtx context.Context) error {
-		logger.InfoContext(ctx, "Stopping http server...")
+		logger.InfoContext(closeCtx, "Stopping http server...")
 
 		if err := server.Shutdown(closeCtx); err != nil {
 			return fmt.Errorf("shutdown http server: %w", err)
 		}
 
-		logger.InfoContext(ctx, "Http server stopped")
+		logger.InfoContext(closeCtx, "Http server stopped")
 
 		return nil
 	})

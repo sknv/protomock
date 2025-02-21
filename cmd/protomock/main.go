@@ -6,13 +6,13 @@ import (
 	"fmt"
 	stdlog "log"
 	"log/slog"
-	"net/http"
 	"time"
 
 	_ "go.uber.org/automaxprocs"
 
 	"github.com/sknv/protomock/internal/config"
 	"github.com/sknv/protomock/internal/container"
+	"github.com/sknv/protomock/internal/transport/http"
 	"github.com/sknv/protomock/pkg/http/middleware"
 	"github.com/sknv/protomock/pkg/log"
 	"github.com/sknv/protomock/pkg/os"
@@ -74,7 +74,8 @@ func buildApp(_ context.Context, cfg *config.Config) (*container.Application, er
 		})
 		router.Use(defaultMiddlewares...)
 
-		router.HandleFunc("/", http.NotFound) // Common NotFound handler to enable middleware on all routes.
+		handlers := http.NewHandlers()
+		handlers.Route(router)
 	}
 
 	return app, nil
