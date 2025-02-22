@@ -22,13 +22,7 @@ func LogRequest(next bunrouter.HandlerFunc) bunrouter.HandlerFunc {
 		// Log data.
 		ctx := r.Context()
 
-		totalFieldsCount := 9
-		if err != nil {
-			totalFieldsCount++
-		}
-
-		logAttrs := make([]any, 0, totalFieldsCount)
-		logAttrs = append(logAttrs,
+		fields := []any{
 			slog.Int("status", respWriter.status),
 			slog.String("method", r.Method),
 			slog.String("uri", r.RequestURI),
@@ -38,13 +32,12 @@ func LogRequest(next bunrouter.HandlerFunc) bunrouter.HandlerFunc {
 			slog.Int64("latency_ms", time.Since(start).Milliseconds()),
 			slog.String("bytes_in", cmp.Or(r.Header.Get("Content-Length"), "0")),
 			slog.Int("bytes_out", respWriter.size),
-		)
-
+		}
 		if err != nil {
-			logAttrs = append(logAttrs, slog.Any("error", err))
+			fields = append(fields, slog.Any("error", err))
 		}
 
-		log.FromContext(ctx).InfoContext(ctx, "HTTP request handled", logAttrs...)
+		log.FromContext(ctx).InfoContext(ctx, "HTTP request handled", fields...)
 
 		return err
 	}

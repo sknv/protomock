@@ -87,6 +87,7 @@ func buildHTTPServer(app *container.Application, cfg *config.Config) error {
 		middleware.ProvideRequestID,
 		middleware.ProvideLogRequestID,
 		middleware.LogRequest,
+		middleware.HandleError,
 		middleware.Recover,
 	}
 	router := app.RegisterHTTPServer(
