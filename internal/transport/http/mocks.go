@@ -5,6 +5,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/dop251/goja"
+
+	xstrings "github.com/sknv/protomock/pkg/strings"
 )
 
 const (
@@ -21,6 +25,25 @@ type Mock struct {
 }
 
 type Mocks []Mock
+
+func (m Mock) Eval() (Response, error) {
+	vm := goja.New()
+	vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
+
+	eval, err := vm.RunString(m.Script)
+	if err != nil {
+		return Response{}, fmt.Errorf("eval script: %w", err)
+	}
+
+	var response Response
+	if err = vm.ExportTo(eval, &response); err != nil {
+		return Response{}, fmt.Errorf("export response: %w", err)
+	}
+
+	return response, nil
+}
+
+// ----------------------------------------------------------------------------
 
 // BuildMocks traverses the directory and populate Mocks.
 func BuildMocks(mocksDir string) (Mocks, error) {
@@ -60,7 +83,7 @@ func BuildMocks(mocksDir string) (Mocks, error) {
 		mock := Mock{
 			Method: httpMethod,
 			Path:   httpPath,
-			Script: string(content),
+			Script: xstrings.ByteSliceToString(content),
 		}
 
 		mocks = append(mocks, mock)

@@ -13,7 +13,7 @@ import (
 
 	"github.com/sknv/protomock/internal/config"
 	"github.com/sknv/protomock/internal/container"
-	"github.com/sknv/protomock/internal/http"
+	"github.com/sknv/protomock/internal/transport/http"
 	"github.com/sknv/protomock/pkg/http/middleware"
 	"github.com/sknv/protomock/pkg/log"
 	"github.com/sknv/protomock/pkg/os"
@@ -79,7 +79,7 @@ func buildApp(cfg *config.Config) (*container.Application, error) {
 func buildHTTPServer(app *container.Application, cfg *config.Config) error {
 	mocks, err := http.BuildMocks(cfg.HTTPServer.MocksDir)
 	if err != nil {
-		return fmt.Errorf("populate http mocks: %w", err)
+		return fmt.Errorf("build http mocks: %w", err)
 	}
 
 	defaultMiddlewares := []bunrouter.MiddlewareFunc{
