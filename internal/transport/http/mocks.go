@@ -1,12 +1,13 @@
 package http
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/dop251/goja"
+	"github.com/sknv/protomock/pkg/js"
 
 	xstrings "github.com/sknv/protomock/pkg/strings"
 )
@@ -26,9 +27,14 @@ type Mock struct {
 
 type Mocks []Mock
 
-func (m Mock) Eval(request MockRequest) (MockResponse, error) {
-	vm := goja.New()
-	vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
+func (m Mock) Eval(ctx context.Context, request MockRequest) (MockResponse, error) {
+	vm := js.NewRuntime()
+
+	if err := vm.Set("console", map[string]any{
+		"log": js.ConsoleLog(ctx),
+	}); err != nil {
+		return MockResponse{}, fmt.Errorf("set console in runtime: %w", err)
+	}
 
 	if err := vm.Set("request", request); err != nil {
 		return MockResponse{}, fmt.Errorf("set request in runtime: %w", err)
