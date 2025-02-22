@@ -13,7 +13,7 @@ import (
 
 	"github.com/sknv/protomock/internal/config"
 	"github.com/sknv/protomock/internal/container"
-	"github.com/sknv/protomock/internal/transport/http"
+	"github.com/sknv/protomock/internal/http"
 	"github.com/sknv/protomock/pkg/http/middleware"
 	"github.com/sknv/protomock/pkg/log"
 	"github.com/sknv/protomock/pkg/os"
@@ -36,10 +36,13 @@ func run(cfg *config.Config) error {
 	appCtx, cancelApp := context.WithCancel(context.Background())
 	defer cancelApp()
 
-	app := buildApp(cfg)
+	app, err := buildApp(cfg)
+	if err != nil {
+		return fmt.Errorf("build application: %w", err)
+	}
 
 	// Start the application and wait for the signal to shutdown.
-	if err := app.Run(appCtx); err != nil {
+	if err = app.Run(appCtx); err != nil {
 		return fmt.Errorf("run apllcation: %w", err)
 	}
 
@@ -48,7 +51,7 @@ func run(cfg *config.Config) error {
 	// Stop the application.
 	cancelApp()
 
-	if err := stopApp(app, _stopTimeout); err != nil {
+	if err = stopApp(app, _stopTimeout); err != nil {
 		app.Logger().Unwrap().
 			ErrorContext(appCtx, "Can't stop application properly", slog.Any("error", err))
 	}
@@ -56,7 +59,7 @@ func run(cfg *config.Config) error {
 	return nil
 }
 
-func buildApp(cfg *config.Config) *container.Application {
+func buildApp(cfg *config.Config) (*container.Application, error) {
 	app := container.NewApplication()
 
 	// Logger.
@@ -65,13 +68,20 @@ func buildApp(cfg *config.Config) *container.Application {
 
 	// HTTP server.
 	if cfg.HTTPServer.Enabled {
-		buildHttpServer(app, cfg)
+		if err := buildHTTPServer(app, cfg); err != nil {
+			return nil, fmt.Errorf("build http server: %w", err)
+		}
 	}
 
-	return app
+	return app, nil
 }
 
-func buildHttpServer(app *container.Application, cfg *config.Config) {
+func buildHTTPServer(app *container.Application, cfg *config.Config) error {
+	mocks, err := http.BuildMocks(cfg.HTTPServer.MocksDir)
+	if err != nil {
+		return fmt.Errorf("populate http mocks: %w", err)
+	}
+
 	defaultMiddlewares := []bunrouter.MiddlewareFunc{
 		middleware.ProvideContextLogger(app.Logger().Unwrap()),
 		middleware.ProvideRequestID,
@@ -84,8 +94,10 @@ func buildHttpServer(app *container.Application, cfg *config.Config) {
 		bunrouter.Use(defaultMiddlewares...),
 	)
 
-	handlers := http.NewHandlers()
+	handlers := http.NewHandlers(mocks)
 	handlers.Route(router)
+
+	return nil
 }
 
 // stopApp tryes to stop the app gracefully.
