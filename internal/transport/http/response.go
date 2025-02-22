@@ -8,17 +8,17 @@ import (
 )
 
 type (
-	ReponseHeaders map[string]string
-	ReponseBody    map[string]any
+	MockResponseHeaders map[string]string
+	MockResponseBody    map[string]any
 )
 
-type Response struct {
-	Status  int            `json:"status"`
-	Headers ReponseHeaders `json:"headers"`
-	Body    ReponseBody    `json:"body"`
+type MockResponse struct {
+	Status  int                 `json:"status"`
+	Headers MockResponseHeaders `json:"headers"`
+	Body    MockResponseBody    `json:"body"`
 }
 
-func (r Response) JSON(w http.ResponseWriter) error {
+func (r MockResponse) JSON(w http.ResponseWriter) error {
 	for header, value := range r.Headers {
 		w.Header().Set(header, value)
 	}

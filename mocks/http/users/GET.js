@@ -6,6 +6,7 @@ function main() {
       users: {
         list: [
           {
+            id: "1",
             name: "John",
             surname: "Doe"
           }

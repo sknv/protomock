@@ -26,18 +26,19 @@ type Mock struct {
 
 type Mocks []Mock
 
-func (m Mock) Eval() (Response, error) {
+func (m Mock) Eval(request MockRequest) (MockResponse, error) {
 	vm := goja.New()
 	vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
+	vm.Set("request", request)
 
 	eval, err := vm.RunString(m.Script)
 	if err != nil {
-		return Response{}, fmt.Errorf("eval script: %w", err)
+		return MockResponse{}, fmt.Errorf("eval script: %w", err)
 	}
 
-	var response Response
+	var response MockResponse
 	if err = vm.ExportTo(eval, &response); err != nil {
-		return Response{}, fmt.Errorf("export response: %w", err)
+		return MockResponse{}, fmt.Errorf("export response: %w", err)
 	}
 
 	return response, nil
