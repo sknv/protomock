@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/uptrace/bunrouter"
 	_ "go.uber.org/automaxprocs"
 
 	"github.com/sknv/protomock/internal/config"
@@ -35,13 +36,10 @@ func run(cfg *config.Config) error {
 	appCtx, cancelApp := context.WithCancel(context.Background())
 	defer cancelApp()
 
-	app, err := buildApp(appCtx, cfg)
-	if err != nil {
-		return fmt.Errorf("build application: %w", err)
-	}
+	app := buildApp(cfg)
 
 	// Start the application and wait for the signal to shutdown.
-	if err = app.Run(appCtx); err != nil {
+	if err := app.Run(appCtx); err != nil {
 		return fmt.Errorf("run apllcation: %w", err)
 	}
 
@@ -50,7 +48,7 @@ func run(cfg *config.Config) error {
 	// Stop the application.
 	cancelApp()
 
-	if err = stopApp(app, _stopTimeout); err != nil {
+	if err := stopApp(app, _stopTimeout); err != nil {
 		app.Logger().Unwrap().
 			ErrorContext(appCtx, "Can't stop application properly", slog.Any("error", err))
 	}
@@ -58,7 +56,7 @@ func run(cfg *config.Config) error {
 	return nil
 }
 
-func buildApp(_ context.Context, cfg *config.Config) (*container.Application, error) {
+func buildApp(cfg *config.Config) *container.Application {
 	app := container.NewApplication()
 
 	// Logger.
@@ -66,19 +64,28 @@ func buildApp(_ context.Context, cfg *config.Config) (*container.Application, er
 	slog.SetDefault(logger) // Sets the global default logger.
 
 	// HTTP server.
-	{
-		router := app.RegisterHTTPServer(cfg.HTTPServer.Address)
-		defaultMiddlewares := middleware.ApplyDefault(middleware.Config{
-			Logger:  logger,
-			Skipper: nil,
-		})
-		router.Use(defaultMiddlewares...)
-
-		handlers := http.NewHandlers()
-		handlers.Route(router)
+	if cfg.HTTPServer.Enabled {
+		buildHttpServer(app, cfg)
 	}
 
-	return app, nil
+	return app
+}
+
+func buildHttpServer(app *container.Application, cfg *config.Config) {
+	defaultMiddlewares := []bunrouter.MiddlewareFunc{
+		middleware.ProvideContextLogger(app.Logger().Unwrap()),
+		middleware.ProvideRequestID,
+		middleware.ProvideLogRequestID,
+		middleware.LogRequest,
+		middleware.Recover,
+	}
+	router := app.RegisterHTTPServer(
+		cfg.HTTPServer.Address,
+		bunrouter.Use(defaultMiddlewares...),
+	)
+
+	handlers := http.NewHandlers()
+	handlers.Route(router)
 }
 
 // stopApp tryes to stop the app gracefully.

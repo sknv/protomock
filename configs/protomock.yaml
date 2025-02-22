@@ -2,4 +2,12 @@ log:
   level: DEBUG
 
 httpserver:
+  enabled: true
   address: ':8000'
+  mocksdir: './mocks/http'
+
+grpcserver:
+  enabled: true
+  address: ':8010'
+  mocksdir: './mocks/grpc/mocks'
+  protosdir: './mocks/grpc/protos'

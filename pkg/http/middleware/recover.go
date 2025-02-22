@@ -5,13 +5,15 @@ import (
 	"net/http"
 	"runtime/debug"
 
+	"github.com/uptrace/bunrouter"
+
 	"github.com/sknv/protomock/pkg/log"
 )
 
 // Recover is a middleware that recovers from panics, logs the panic and returns a HTTP 500 status if possible.
-func Recover(next http.Handler) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		defer func() { //nolint:contextcheck // panic recover
+func Recover(next bunrouter.HandlerFunc) bunrouter.HandlerFunc {
+	return func(w http.ResponseWriter, r bunrouter.Request) error {
+		defer func() {
 			if rvr := recover(); rvr != nil {
 				ctx := r.Context()
 				log.FromContext(ctx).ErrorContext(ctx, "Request panic",
@@ -24,8 +26,6 @@ func Recover(next http.Handler) http.Handler {
 			}
 		}()
 
-		next.ServeHTTP(w, r)
+		return next(w, r)
 	}
-
-	return http.HandlerFunc(handler)
 }

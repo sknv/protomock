@@ -21,7 +21,9 @@ type LogConfig struct {
 }
 
 type HTTPServerConfig struct {
-	Address string `yaml:"address" envconfig:"HTTP_SERVER_ADDRESS"`
+	Enabled  bool   `yaml:"enabled" envconfig:"HTTP_SERVER_ENABLED"`
+	Address  string `yaml:"address" envconfig:"HTTP_SERVER_ADDRESS"`
+	MocksDir string `yaml:"mocksdir" envconfig:"HTTP_SERVER_MOCKSDIR"`
 }
 
 type Config struct {

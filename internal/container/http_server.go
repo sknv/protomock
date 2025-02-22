@@ -9,17 +9,18 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sknv/protomock/pkg/http/routegroup"
+	"github.com/uptrace/bunrouter"
+
 	"github.com/sknv/protomock/pkg/option"
 )
 
 type httpServer struct {
-	router *routegroup.Group
+	router *bunrouter.Router
 	server *http.Server
 }
 
-func (a *Application) RegisterHTTPServer(address string) *routegroup.Group {
-	router := routegroup.New(http.NewServeMux())
+func (a *Application) RegisterHTTPServer(address string, opts ...bunrouter.Option) *bunrouter.Router {
+	router := bunrouter.New(opts...)
 	httpServer := &httpServer{
 		router: router,
 		server: newHTTPServer(address, router),
@@ -30,14 +31,14 @@ func (a *Application) RegisterHTTPServer(address string) *routegroup.Group {
 	return router
 }
 
-func (a *Application) Router() option.Option[*routegroup.Group] {
+func (a *Application) Router() option.Option[*bunrouter.Router] {
 	if a.httpServer.IsSome() {
 		return option.Some(
 			a.httpServer.Unwrap().router,
 		)
 	}
 
-	return option.None[*routegroup.Group]()
+	return option.None[*bunrouter.Router]()
 }
 
 // ----------------------------------------------------------------------------

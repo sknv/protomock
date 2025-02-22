@@ -6,40 +6,34 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/uptrace/bunrouter"
+
 	"github.com/sknv/protomock/pkg/log"
 )
 
 // LogRequest is a slightly modified version of the provided logger middleware.
-func LogRequest(skipper Skipper) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		handler := func(w http.ResponseWriter, r *http.Request) {
-			if skipper != nil && skipper(r) {
-				next.ServeHTTP(w, r)
+func LogRequest(next bunrouter.HandlerFunc) bunrouter.HandlerFunc {
+	return func(w http.ResponseWriter, r bunrouter.Request) error {
+		start := time.Now()
 
-				return
-			}
+		respWriter := newCustomResponseWriter(w) // Save a response status.
+		err := next(&respWriter, r)
 
-			start := time.Now()
+		// Log data.
+		ctx := r.Context()
+		log.FromContext(ctx).InfoContext(ctx, "HTTP request handled",
+			slog.String("remote_ip", r.RemoteAddr),
+			slog.String("host", r.Host),
+			slog.String("method", r.Method),
+			slog.String("uri", r.RequestURI),
+			slog.String("user_agent", r.UserAgent()),
+			slog.Int("status", respWriter.status),
+			slog.Int64("latency_ms", time.Since(start).Milliseconds()),
+			slog.String("bytes_in", cmp.Or(r.Header.Get("Content-Length"), "0")),
+			slog.Int("bytes_out", respWriter.size),
+		)
 
-			respWriter := newCustomResponseWriter(w) // Save a response status.
-			next.ServeHTTP(&respWriter, r)
-
-			// Log data.
-			ctx := r.Context()
-			log.FromContext(ctx).InfoContext(ctx, "HTTP request handled",
-				slog.String("remote_ip", r.RemoteAddr),
-				slog.String("host", r.Host),
-				slog.String("method", r.Method),
-				slog.String("uri", r.RequestURI),
-				slog.String("user_agent", r.UserAgent()),
-				slog.Int("status", respWriter.status),
-				slog.Int64("latency_ms", time.Since(start).Milliseconds()),
-				slog.String("bytes_in", cmp.Or(r.Header.Get("Content-Length"), "0")),
-				slog.Int("bytes_out", respWriter.size),
-			)
-		}
-
-		return http.HandlerFunc(handler)
+		return err
 	}
 }
 
