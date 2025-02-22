@@ -29,7 +29,10 @@ type Mocks []Mock
 func (m Mock) Eval(request MockRequest) (MockResponse, error) {
 	vm := goja.New()
 	vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
-	vm.Set("request", request)
+
+	if err := vm.Set("request", request); err != nil {
+		return MockResponse{}, fmt.Errorf("set request in runtime: %w", err)
+	}
 
 	eval, err := vm.RunString(m.Script)
 	if err != nil {

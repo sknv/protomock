@@ -25,7 +25,12 @@ func (h *Handlers) Route(router *bunrouter.Router) {
 
 func (h *Handlers) handleMockRequest(router *bunrouter.Router, mock Mock) {
 	router.Handle(mock.Method, mock.Path, func(w http.ResponseWriter, r bunrouter.Request) error {
-		response, err := mock.Eval(NewMockRequestFrom(r))
+		request, err := NewMockRequestFrom(r)
+		if err != nil {
+			return fmt.Errorf("parse request: %w", err)
+		}
+
+		response, err := mock.Eval(request)
 		if err != nil {
 			return fmt.Errorf("evaluate mock: %w", err)
 		}
