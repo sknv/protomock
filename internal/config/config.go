@@ -22,7 +22,7 @@ type LogConfig struct {
 
 type HTTPServerConfig struct {
 	Enabled  bool   `yaml:"enabled" envconfig:"HTTP_SERVER_ENABLED"`
-	Address  string `yaml:"address" envconfig:"HTTP_SERVER_ADDRESS"`
+	Port     int    `yaml:"port" envconfig:"HTTP_SERVER_PORT"`
 	MocksDir string `yaml:"mocksdir" envconfig:"HTTP_SERVER_MOCKSDIR"`
 }
 

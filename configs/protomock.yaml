@@ -3,11 +3,11 @@ log:
 
 httpserver:
   enabled: true
-  address: ':8000'
+  port: 8000
   mocksdir: './mocks/http'
 
 grpcserver:
   enabled: true
-  address: ':8010'
+  port: 8010
   mocksdir: './mocks/grpc/mocks'
   protosdir: './mocks/grpc/protos'

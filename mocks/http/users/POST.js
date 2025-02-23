@@ -1,4 +1,4 @@
-function main() {
+(function () {
   let name = request.body.name ?? "John"
   let surname = request.body.surname ?? "Doe"
 
@@ -17,6 +17,4 @@ function main() {
       }
     }
   }
-}
-
-main()
+})()

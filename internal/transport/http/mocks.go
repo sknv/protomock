@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/sknv/protomock/pkg/js"
-
 	xstrings "github.com/sknv/protomock/pkg/strings"
 )
 
@@ -30,9 +29,8 @@ type Mocks []Mock
 func (m Mock) Eval(ctx context.Context, request MockRequest) (MockResponse, error) {
 	vm := js.NewRuntime()
 
-	if err := vm.Set("console", map[string]any{
-		"log": js.ConsoleLog(ctx),
-	}); err != nil {
+	console := js.NewConsole(ctx)
+	if err := vm.Set("console", console); err != nil {
 		return MockResponse{}, fmt.Errorf("set console in runtime: %w", err)
 	}
 

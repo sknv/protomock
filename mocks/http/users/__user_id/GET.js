@@ -1,4 +1,4 @@
-function main() {
+(function () {
   let name = request.headers["Test-Case-Name"] ?? "John"
 
   return {
@@ -12,6 +12,4 @@ function main() {
       }
     }
   }
-}
-
-main()
+})()

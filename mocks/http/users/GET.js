@@ -1,4 +1,4 @@
-function main() {
+(function () {
   console.log("Incoming headers are", JSON.stringify(request.headers))
 
   return {
@@ -16,6 +16,4 @@ function main() {
       }
     }
   }
-}
-
-main()
+})()

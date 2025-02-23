@@ -91,7 +91,7 @@ func buildHTTPServer(app *container.Application, cfg *config.Config) error {
 		middleware.Recover,
 	}
 	router := app.RegisterHTTPServer(
-		cfg.HTTPServer.Address,
+		fmt.Sprintf(":%d", cfg.HTTPServer.Port),
 		bunrouter.Use(defaultMiddlewares...),
 	)
 

@@ -9,20 +9,29 @@ import (
 	"github.com/sknv/protomock/pkg/log"
 )
 
-func ConsoleLog(ctx context.Context) func(call goja.FunctionCall) goja.Value {
-	return func(call goja.FunctionCall) goja.Value {
-		var args strings.Builder
+type Console struct {
+	ctx context.Context //nolint:containedctx // should use a new instance for every evaluation
+}
 
-		for i, arg := range call.Arguments {
-			if i > 0 {
-				args.WriteByte(' ')
-			}
+func NewConsole(ctx context.Context) Console {
+	return Console{
+		ctx: ctx,
+	}
+}
 
-			args.WriteString(arg.String())
+func (c Console) Log(call goja.FunctionCall) goja.Value { //nolint:ireturn // contract
+	var args strings.Builder
+
+	for i, arg := range call.Arguments {
+		if i > 0 {
+			args.WriteByte(' ')
 		}
 
-		log.FromContext(ctx).InfoContext(ctx, args.String())
-
-		return nil
+		args.WriteString(arg.String())
 	}
+
+	ctx := c.ctx
+	log.FromContext(ctx).InfoContext(ctx, args.String())
+
+	return nil
 }

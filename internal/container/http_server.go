@@ -43,7 +43,7 @@ func (a *Application) Router() option.Option[*bunrouter.Router] {
 
 // ----------------------------------------------------------------------------
 
-const _readHeaderTimeout = time.Second * 30
+const _readHeaderTimeout = time.Second * 10
 
 func newHTTPServer(address string, handler http.Handler) *http.Server {
 	return &http.Server{ //nolint:exhaustruct // too many unused fields
