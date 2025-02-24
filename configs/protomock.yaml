@@ -1,5 +1,5 @@
 log:
-  level: DEBUG
+  level: INFO # DEBUG/INFO/WARN/ERROR
 
 httpserver:
   enabled: true

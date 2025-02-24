@@ -26,9 +26,17 @@ type HTTPServerConfig struct {
 	MocksDir string `yaml:"mocksdir" envconfig:"HTTP_SERVER_MOCKSDIR"`
 }
 
+type GRPCServerConfig struct {
+	Enabled   bool   `yaml:"enabled" envconfig:"GRPC_SERVER_ENABLED"`
+	Port      int    `yaml:"port" envconfig:"GRPC_SERVER_PORT"`
+	MocksDir  string `yaml:"mocksdir" envconfig:"GRPC_SERVER_MOCKSDIR"`
+	ProtosDir string `yaml:"protosdir" envconfig:"GRPC_SERVER_PROTOSDIR"`
+}
+
 type Config struct {
 	Log        LogConfig        `yaml:"log"`
 	HTTPServer HTTPServerConfig `yaml:"httpserver"`
+	GRPCServer GRPCServerConfig `yaml:"grpcserver"`
 }
 
 func Parse(filePath string) (*Config, error) {

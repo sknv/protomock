@@ -15,6 +15,7 @@ type Application struct {
 	closers    *closer.Closers
 	logger     option.Option[*slog.Logger]
 	httpServer option.Option[*httpServer]
+	grpcServer option.Option[*grpcServer]
 }
 
 func NewApplication() *Application {
@@ -22,6 +23,7 @@ func NewApplication() *Application {
 		closers:    closer.New(),
 		logger:     option.None[*slog.Logger](),
 		httpServer: option.None[*httpServer](),
+		grpcServer: option.None[*grpcServer](),
 	}
 }
 
@@ -29,7 +31,10 @@ func (a *Application) Run(ctx context.Context) error {
 	logger := a.logger.UnwrapOrElse(slog.Default)
 	logger.InfoContext(ctx, "Starting application...")
 
-	if err := runParallel(ctx, a.runHTTPServer); err != nil {
+	if err := runParallel(ctx,
+		a.runHTTPServer,
+		a.runGRPCServer,
+	); err != nil {
 		return fmt.Errorf("run components in parallel: %w", err)
 	}
 

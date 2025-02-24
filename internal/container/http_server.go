@@ -31,7 +31,7 @@ func (a *Application) RegisterHTTPServer(address string, opts ...bunrouter.Optio
 	return router
 }
 
-func (a *Application) Router() option.Option[*bunrouter.Router] {
+func (a *Application) HTTPRouter() option.Option[*bunrouter.Router] {
 	if a.httpServer.IsSome() {
 		return option.Some(
 			a.httpServer.Unwrap().router,

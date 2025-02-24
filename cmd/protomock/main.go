@@ -73,6 +73,13 @@ func buildApp(cfg *config.Config) (*container.Application, error) {
 		}
 	}
 
+	// GRPC server.
+	if cfg.GRPCServer.Enabled {
+		if err := buildGRPCerver(app, cfg); err != nil {
+			return nil, fmt.Errorf("build grpc server: %w", err)
+		}
+	}
+
 	return app, nil
 }
 
@@ -97,6 +104,14 @@ func buildHTTPServer(app *container.Application, cfg *config.Config) error {
 
 	handlers := http.NewHandlers(mocks)
 	handlers.Route(router)
+
+	return nil
+}
+
+func buildGRPCerver(app *container.Application, cfg *config.Config) error {
+	_ = app.RegisterGRPCServer(
+		fmt.Sprintf(":%d", cfg.GRPCServer.Port),
+	)
 
 	return nil
 }
