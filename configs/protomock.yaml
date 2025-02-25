@@ -9,5 +9,4 @@ httpserver:
 grpcserver:
   enabled: true
   port: 8010
-  mocksdir: './mocks/grpc/mocks'
-  protosdir: './mocks/grpc/protos'
+  mocksdir: './mocks/grpc'

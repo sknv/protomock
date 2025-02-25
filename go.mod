@@ -3,6 +3,7 @@ module github.com/sknv/protomock
 go 1.24
 
 require (
+	github.com/bufbuild/protocompile v0.14.1
 	github.com/dop251/goja v0.0.0-20250125213203-5ef83b82af17
 	github.com/goccy/go-json v0.10.5
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -18,7 +19,7 @@ require (
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/rogpeppe/go-internal v1.14.0 // indirect
+	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	golang.org/x/net v0.32.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect

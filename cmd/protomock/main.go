@@ -13,6 +13,7 @@ import (
 
 	"github.com/sknv/protomock/internal/config"
 	"github.com/sknv/protomock/internal/container"
+	"github.com/sknv/protomock/internal/transport/grpc"
 	"github.com/sknv/protomock/internal/transport/http"
 	"github.com/sknv/protomock/pkg/http/middleware"
 	"github.com/sknv/protomock/pkg/log"
@@ -36,7 +37,7 @@ func run(cfg *config.Config) error {
 	appCtx, cancelApp := context.WithCancel(context.Background())
 	defer cancelApp()
 
-	app, err := buildApp(cfg)
+	app, err := buildApp(appCtx, cfg)
 	if err != nil {
 		return fmt.Errorf("build application: %w", err)
 	}
@@ -59,7 +60,7 @@ func run(cfg *config.Config) error {
 	return nil
 }
 
-func buildApp(cfg *config.Config) (*container.Application, error) {
+func buildApp(ctx context.Context, cfg *config.Config) (*container.Application, error) {
 	app := container.NewApplication()
 
 	// Logger.
@@ -75,7 +76,7 @@ func buildApp(cfg *config.Config) (*container.Application, error) {
 
 	// GRPC server.
 	if cfg.GRPCServer.Enabled {
-		if err := buildGRPCerver(app, cfg); err != nil {
+		if err := buildGRPCerver(ctx, app, cfg); err != nil {
 			return nil, fmt.Errorf("build grpc server: %w", err)
 		}
 	}
@@ -108,10 +109,18 @@ func buildHTTPServer(app *container.Application, cfg *config.Config) error {
 	return nil
 }
 
-func buildGRPCerver(app *container.Application, cfg *config.Config) error {
-	_ = app.RegisterGRPCServer(
+func buildGRPCerver(ctx context.Context, app *container.Application, cfg *config.Config) error {
+	packages, err := grpc.BuildPackages(ctx, cfg.GRPCServer.MocksDir)
+	if err != nil {
+		return fmt.Errorf("build http mocks: %w", err)
+	}
+
+	server := app.RegisterGRPCServer(
 		fmt.Sprintf(":%d", cfg.GRPCServer.Port),
 	)
+
+	handlers := grpc.NewHandlers(packages)
+	handlers.Route(server)
 
 	return nil
 }

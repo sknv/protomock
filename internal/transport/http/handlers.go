@@ -19,11 +19,11 @@ func NewHandlers(mocks Mocks) *Handlers {
 
 func (h *Handlers) Route(router *bunrouter.Router) {
 	for _, mock := range h.mocks {
-		h.handleMockRequest(router, mock)
+		handleMockRequest(router, mock)
 	}
 }
 
-func (h *Handlers) handleMockRequest(router *bunrouter.Router, mock Mock) {
+func handleMockRequest(router *bunrouter.Router, mock Mock) {
 	router.Handle(mock.Method, mock.Path, func(w http.ResponseWriter, r bunrouter.Request) error {
 		ctx := r.Context()
 
