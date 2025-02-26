@@ -19,7 +19,8 @@ func NewConsole(ctx context.Context) Console {
 	}
 }
 
-func (c Console) Log(call goja.FunctionCall) goja.Value { //nolint:ireturn // contract
+//nolint:ireturn,nolintlint // contract
+func (c Console) Log(call goja.FunctionCall) goja.Value {
 	var args strings.Builder
 
 	for i, arg := range call.Arguments {

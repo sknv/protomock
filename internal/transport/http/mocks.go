@@ -45,7 +45,7 @@ func (m Mock) Eval(ctx context.Context, request MockRequest) (MockResponse, erro
 
 	var response MockResponse
 	if err = vm.ExportTo(eval, &response); err != nil {
-		return MockResponse{}, fmt.Errorf("export response: %w", err)
+		return MockResponse{}, fmt.Errorf("export response from js: %w", err)
 	}
 
 	return response, nil
@@ -73,17 +73,18 @@ func BuildMocks(mocksDir string) (Mocks, error) {
 			return nil
 		}
 
+		// Build a mock from file.
 		content, err := os.ReadFile(path)
 		if err != nil {
 			return fmt.Errorf("read file: %w", err)
 		}
 
-		// Build a mock from file.
 		httpMethod := strings.TrimSuffix(info.Name(), _mockFileExtension)
-		httpPath := strings.ReplaceAll( // Replace wildcards for router.
-			filepath.ToSlash( // Transform OS-specific separators to slashes.
-				strings.TrimPrefix(filepath.Dir(path), filepath.Clean(mocksDir)), // Trim original mocks dir.
-			),
+		httpPath := filepath.ToSlash( // Transform OS-specific separators to slashes.
+			strings.TrimPrefix(filepath.Dir(path), filepath.Clean(mocksDir)), // Trim original mocks dir.
+		)
+		httpPath = strings.ReplaceAll( // Replace wildcards for router.
+			httpPath,
 			wildcardPatternToFind,
 			wildcardPaternToReplace,
 		)

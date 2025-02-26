@@ -8,21 +8,15 @@ import (
 )
 
 type (
-	MockResponseHeaders map[string]string
-	MockResponseBody    map[string]any
+	MockResponseBody map[string]any
 )
 
 type MockResponse struct {
-	Status  int                 `json:"status"`
-	Headers MockResponseHeaders `json:"headers"`
-	Body    MockResponseBody    `json:"body"`
+	Status int              `json:"status"`
+	Body   MockResponseBody `json:"body"`
 }
 
 func (r MockResponse) JSON(w http.ResponseWriter) error {
-	for header, value := range r.Headers {
-		w.Header().Set(header, value)
-	}
-
 	if err := render.JSON(w, r.Status, r.Body); err != nil {
 		return fmt.Errorf("render json: %w", err)
 	}

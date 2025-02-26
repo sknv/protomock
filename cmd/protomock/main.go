@@ -8,13 +8,18 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"github.com/uptrace/bunrouter"
 	_ "go.uber.org/automaxprocs"
+	"google.golang.org/grpc"
 
 	"github.com/sknv/protomock/internal/config"
 	"github.com/sknv/protomock/internal/container"
-	"github.com/sknv/protomock/internal/transport/grpc"
-	"github.com/sknv/protomock/internal/transport/http"
+	transportGRPC "github.com/sknv/protomock/internal/transport/grpc"
+	transportHTTP "github.com/sknv/protomock/internal/transport/http"
+	ctxloggermw "github.com/sknv/protomock/pkg/grpc/middleware/ctxlogger"
+	loggermw "github.com/sknv/protomock/pkg/grpc/middleware/logger"
+	requestidmw "github.com/sknv/protomock/pkg/grpc/middleware/requestid"
 	"github.com/sknv/protomock/pkg/http/middleware"
 	"github.com/sknv/protomock/pkg/log"
 	"github.com/sknv/protomock/pkg/os"
@@ -76,7 +81,7 @@ func buildApp(ctx context.Context, cfg *config.Config) (*container.Application, 
 
 	// GRPC server.
 	if cfg.GRPCServer.Enabled {
-		if err := buildGRPCerver(ctx, app, cfg); err != nil {
+		if err := buildGRPServer(ctx, app, cfg); err != nil {
 			return nil, fmt.Errorf("build grpc server: %w", err)
 		}
 	}
@@ -84,8 +89,9 @@ func buildApp(ctx context.Context, cfg *config.Config) (*container.Application, 
 	return app, nil
 }
 
+//nolint:contextcheck,nolintlint // false positive
 func buildHTTPServer(app *container.Application, cfg *config.Config) error {
-	mocks, err := http.BuildMocks(cfg.HTTPServer.MocksDir)
+	mocks, err := transportHTTP.BuildMocks(cfg.HTTPServer.MocksDir)
 	if err != nil {
 		return fmt.Errorf("build http mocks: %w", err)
 	}
@@ -103,29 +109,36 @@ func buildHTTPServer(app *container.Application, cfg *config.Config) error {
 		bunrouter.Use(defaultMiddlewares...),
 	)
 
-	handlers := http.NewHandlers(mocks)
+	handlers := transportHTTP.NewHandlers(mocks)
 	handlers.Route(router)
 
 	return nil
 }
 
-func buildGRPCerver(ctx context.Context, app *container.Application, cfg *config.Config) error {
-	packages, err := grpc.BuildPackages(ctx, cfg.GRPCServer.MocksDir)
+func buildGRPServer(ctx context.Context, app *container.Application, cfg *config.Config) error {
+	packages, err := transportGRPC.BuildPackages(ctx, cfg.GRPCServer.MocksDir)
 	if err != nil {
-		return fmt.Errorf("build http mocks: %w", err)
+		return fmt.Errorf("build grpc packages: %w", err)
 	}
 
 	server := app.RegisterGRPCServer(
 		fmt.Sprintf(":%d", cfg.GRPCServer.Port),
+		grpc.ChainUnaryInterceptor(
+			ctxloggermw.ProvideUnaryContextLogger(app.Logger().Unwrap()),
+			requestidmw.ProvideUnaryRequestID,
+			ctxloggermw.ProvideUnaryLogRequestID,
+			loggermw.LogUnaryRequest,
+			recovery.UnaryServerInterceptor(),
+		),
 	)
 
-	handlers := grpc.NewHandlers(packages)
+	handlers := transportGRPC.NewHandlers(packages)
 	handlers.Route(server)
 
 	return nil
 }
 
-// stopApp tryes to stop the app gracefully.
+// stopApp tries to stop the app gracefully.
 func stopApp(app *container.Application, timeout time.Duration) error {
 	stopCtx, cancelStop := context.WithTimeout(context.Background(), timeout)
 	defer cancelStop()

@@ -4,7 +4,6 @@
 
   return {
     status: 201,
-    headers: null,
     body: {
       users: {
         list: [

@@ -8,7 +8,6 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 
 	"github.com/sknv/protomock/pkg/closer"
 	"github.com/sknv/protomock/pkg/option"
@@ -21,7 +20,6 @@ type grpcServer struct {
 
 func (a *Application) RegisterGRPCServer(address string, opts ...grpc.ServerOption) *grpc.Server {
 	server := grpc.NewServer(opts...)
-	reflection.Register(server) // Register reflection service on gRPC server.
 
 	grpcServer := &grpcServer{
 		address: address,

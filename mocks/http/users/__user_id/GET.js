@@ -3,7 +3,6 @@
 
   return {
     status: 200,
-    headers: null,
     body: {
       user: {
         id: `${request.params.user_id}`,
