@@ -1,6 +1,10 @@
 package option
 
-import "github.com/goccy/go-json"
+import (
+	"github.com/goccy/go-json"
+
+	"github.com/sknv/protomock/pkg/strings"
+)
 
 //nolint:gochecknoglobals // constants
 var (
@@ -21,7 +25,7 @@ func (o *Option[T]) UnmarshalJSON(data []byte) error {
 	var zero T
 	o.isSet, o.value = false, zero
 
-	if len(data) == 0 || string(data) == _nullJSONString {
+	if len(data) == 0 || strings.ByteSliceToString(data) == _nullJSONString {
 		return nil
 	}
 
