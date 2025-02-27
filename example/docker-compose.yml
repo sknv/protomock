@@ -1,0 +1,11 @@
+services:
+  protomock:
+    build:
+      context: ../                   # The build context
+      dockerfile: ./build/Dockerfile # Path to the Dockerfile (relative to the context)
+    ports:
+      - "8000:8000" # HTTP port
+      - "8010:8010" # gRPC port
+    volumes:
+      - ./configs:/app/configs
+      - ./mocks:/app/mocks

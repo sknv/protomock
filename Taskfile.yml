@@ -26,3 +26,7 @@ tasks:
   run:
     cmds:
       - go run ./cmd/protomock
+
+  release:
+    cmds:
+      - go build -ldflags="-s -w" ./cmd/protomock
