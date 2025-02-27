@@ -37,10 +37,6 @@ func handleMockRequest(router *bunrouter.Router, mock Mock) {
 			return fmt.Errorf("evaluate mock: %w", err)
 		}
 
-		if err = response.JSON(w); err != nil {
-			return fmt.Errorf("json response: %w", err)
-		}
-
-		return nil
+		return response.JSON(w)
 	})
 }

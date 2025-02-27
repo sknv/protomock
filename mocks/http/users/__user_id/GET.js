@@ -1,5 +1,5 @@
 (function () {
-  let name = request.headers["Test-Case-Name"] ?? "John"
+  let name = request.headers["test-case-name"] ?? "John"
 
   return {
     status: 200,

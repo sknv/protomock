@@ -7,9 +7,7 @@ import (
 	"github.com/sknv/protomock/pkg/http/render"
 )
 
-type (
-	MockResponseBody map[string]any
-)
+type MockResponseBody map[string]any
 
 type MockResponse struct {
 	Status int              `json:"status"`

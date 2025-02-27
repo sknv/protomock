@@ -62,12 +62,7 @@ func registerService(server *grpc.Server, service Service) {
 			}
 
 			// Create a dynamic response message.
-			reply, err := response.GRPC(outputType)
-			if err != nil {
-				return nil, fmt.Errorf("encode response: %w", err)
-			}
-
-			return reply, nil
+			return response.GRPC(outputType)
 		}
 
 		grpcMethods = append(grpcMethods, grpc.MethodDesc{

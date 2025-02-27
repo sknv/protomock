@@ -48,7 +48,7 @@ Similarly you can create `PUT.js`, `DELETE.js` etc in your path. For wildcard pa
 Inside a mock you have access to the following request parameters:
 
 - URL parameters
-- Headers
+- Headers in lower case
 - JSON body
 
 ```js
@@ -85,7 +85,7 @@ A sample JS mock file is presented below:
 (function () {
   console.log("Incoming headers are", JSON.stringify(request.headers))
 
-  let name = request.headers["Test-Case-Name"] ?? "John"
+  let name = request.headers["test-case-name"] ?? "John"
 
   return {
     status: 200,
@@ -139,7 +139,7 @@ Now all the gRPC requests to `example.ExampleService.SayHello` method will use `
 
 Inside a mock you have access to the following request parameters:
 
-- Metadata
+- Metadata in lower case
 - Proto body
 
 ```js
@@ -160,9 +160,15 @@ The response has the following structure:
 let response = {
   body: { // Proto body
     ...
+  },
+  error: { // Proto error
+    code: 3,
+    message: "Invalid argument"
   }
 }
 ```
+
+Provide either `body` or `error` field. If there are both, `error` will be used.
 
 You also can log any information via `console.log` function.
 
@@ -171,6 +177,16 @@ A sample JS mock file is presented below:
 ```js
 (function () {
   console.log("Incoming metadata are", JSON.stringify(request.metadata))
+
+  let err = request.metadata['test-case-error']
+  if (err) {
+    return {
+      error: {
+        code: 3,
+        message: "Invalid argument"
+      }
+    }
+  }
 
   return {
     body: {

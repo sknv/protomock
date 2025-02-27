@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/uptrace/bunrouter"
 
@@ -30,7 +31,7 @@ func NewMockRequestFrom(r bunrouter.Request) (MockRequest, error) {
 
 	headers := make(MockRequestHeaders, len(r.Header))
 	for header := range r.Header {
-		headers[header] = r.Header.Get(header)
+		headers[header] = strings.ToLower(r.Header.Get(header))
 	}
 
 	return MockRequest{

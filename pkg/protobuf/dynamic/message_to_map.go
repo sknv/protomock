@@ -28,14 +28,14 @@ func MessageToMap(msg *dynamicpb.Message) (map[string]any, error) {
 			mapValue := msg.Get(field).Map()
 
 			mapValue.Range(func(key protoreflect.MapKey, value protoreflect.Value) bool {
-				keyStr, errConvert := convertMapKey(key)
+				keyStr, errConvert := convertProtoMapKey(key)
 				if errConvert != nil {
 					err = fmt.Errorf("convert map field: %w", errConvert)
 
 					return false
 				}
 
-				convertedValue, errConvert := convertFieldValue(field.MapValue(), value)
+				convertedValue, errConvert := convertProtoFieldValue(field.MapValue(), value)
 				if errConvert != nil {
 					err = fmt.Errorf("convert map value: %w", errConvert)
 
@@ -64,7 +64,7 @@ func MessageToMap(msg *dynamicpb.Message) (map[string]any, error) {
 			for j := range list.Len() {
 				value := list.Get(j)
 
-				convertedValue, err := convertFieldValue(field, value)
+				convertedValue, err := convertProtoFieldValue(field, value)
 				if err != nil {
 					return nil, fmt.Errorf("convert repeated field %s: %w", fieldName, err)
 				}
@@ -80,7 +80,7 @@ func MessageToMap(msg *dynamicpb.Message) (map[string]any, error) {
 		// Handle non-repeated, non-map fields.
 		value := msg.Get(field)
 
-		convertedValue, err := convertFieldValue(field, value)
+		convertedValue, err := convertProtoFieldValue(field, value)
 		if err != nil {
 			return nil, fmt.Errorf("convert field %s: %w", fieldName, err)
 		}
@@ -91,10 +91,10 @@ func MessageToMap(msg *dynamicpb.Message) (map[string]any, error) {
 	return result, nil
 }
 
-// convertFieldValue converts a protoreflect.Value to a Go type based on the field's kind.
+// convertProtoFieldValue converts a protoreflect.Value to a Go type based on the field's kind.
 //
 //nolint:cyclop // helper function
-func convertFieldValue(field protoreflect.FieldDescriptor, value protoreflect.Value) (any, error) {
+func convertProtoFieldValue(field protoreflect.FieldDescriptor, value protoreflect.Value) (any, error) {
 	switch field.Kind() {
 	case protoreflect.BoolKind:
 		return value.Bool(), nil
@@ -116,22 +116,20 @@ func convertFieldValue(field protoreflect.FieldDescriptor, value protoreflect.Va
 		return value.Bytes(), nil
 	case protoreflect.EnumKind:
 		return value.Enum(), nil
-	case protoreflect.MessageKind:
+	case protoreflect.MessageKind, protoreflect.GroupKind:
 		nestedMsg, ok := value.Message().Interface().(*dynamicpb.Message)
 		if !ok {
 			return nil, fmt.Errorf("expected message type, got %T", value.Message().Interface()) //nolint:err113
 		}
 
 		return MessageToMap(nestedMsg)
-	case protoreflect.GroupKind:
-		return nil, fmt.Errorf("unsupported field type: %v", field.Kind()) //nolint:err113
 	default:
 		return nil, fmt.Errorf("unsupported field type: %v", field.Kind()) //nolint:err113
 	}
 }
 
-// convertMapKey converts a protoreflect.MapKey to a string.
-func convertMapKey(key protoreflect.MapKey) (string, error) {
+// convertProtoMapKey converts a protoreflect.MapKey to a string.
+func convertProtoMapKey(key protoreflect.MapKey) (string, error) {
 	switch key.Interface().(type) {
 	case string:
 		return key.String(), nil
