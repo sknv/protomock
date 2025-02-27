@@ -9,10 +9,11 @@ protomock can serve two types of mocks:
 - HTTP requests receiving and responding JSON
 - gRPC unary calls
 
+Take a look at `example` folder with a sample config and mocks.
+
 ## To Be Done
 
 - Add gRPC streaming support
-- Add gRPC unions support
 
 ## Configuration
 
