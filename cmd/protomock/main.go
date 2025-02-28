@@ -96,17 +96,16 @@ func buildHTTPServer(app *container.Application, cfg *config.Config) error {
 		return fmt.Errorf("build http mocks: %w", err)
 	}
 
-	defaultMiddlewares := []bunrouter.MiddlewareFunc{
-		middleware.ProvideContextLogger(app.Logger().Unwrap()),
-		middleware.ProvideRequestID,
-		middleware.ProvideLogRequestID,
-		middleware.LogRequest,
-		middleware.HandleError,
-		middleware.Recover,
-	}
 	router := app.RegisterHTTPServer(
 		fmt.Sprintf(":%d", cfg.HTTPServer.Port),
-		bunrouter.Use(defaultMiddlewares...),
+		bunrouter.Use(
+			middleware.ProvideContextLogger(app.Logger().Unwrap()),
+			middleware.ProvideRequestID,
+			middleware.ProvideLogRequestID,
+			middleware.LogRequest,
+			middleware.HandleError,
+			middleware.Recover,
+		),
 	)
 
 	handlers := transportHTTP.NewHandlers(mocks)
