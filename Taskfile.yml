@@ -17,7 +17,7 @@ tasks:
 
   test:
     cmds:
-      - go test  ./... -v -failfast --tags=integration
+      - go test -v -failfast --tags=integration ./...
 
   lint:
     cmds:
