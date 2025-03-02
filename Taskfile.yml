@@ -30,3 +30,11 @@ tasks:
   release:
     cmds:
       - go build -ldflags="-s -w" ./cmd/protomock
+
+  ##
+  # Docker section
+  ##
+
+  docker-build:
+    cmds:
+      - docker build -f ./build/Dockerfile -t protomock:latest .

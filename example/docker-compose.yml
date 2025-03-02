@@ -1,8 +1,6 @@
 services:
   protomock:
-    build:
-      context: ../                   # The build context
-      dockerfile: ./build/Dockerfile # Path to the Dockerfile (relative to the context)
+    image: skanukov/protomock:latest
     ports:
       - "8000:8000" # HTTP port
       - "8010:8010" # gRPC port
