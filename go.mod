@@ -4,14 +4,14 @@ go 1.24
 
 require (
 	github.com/bufbuild/protocompile v0.14.1
-	github.com/dop251/goja v0.0.0-20250125213203-5ef83b82af17
+	github.com/dop251/goja v0.0.0-20250309171923-bcd7cc6bf64c
 	github.com/goccy/go-json v0.10.5
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.0
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/uptrace/bunrouter v1.0.22
+	github.com/uptrace/bunrouter v1.0.23
 	go.uber.org/automaxprocs v1.6.0
-	golang.org/x/sync v0.11.0
-	google.golang.org/grpc v1.70.0
+	golang.org/x/sync v0.12.0
+	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.5
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -25,5 +25,5 @@ require (
 	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241202173237-19429a94021a // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
 )
