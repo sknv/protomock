@@ -21,7 +21,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.24
+          go-version: '^1.25.x'
 
       - name: Test
         run: go test -v ./...
@@ -29,7 +29,7 @@ jobs:
       - name: Lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.64.5
+          version: v1.64.8
 
   docker-build-and-push:
     runs-on: ubuntu-latest
