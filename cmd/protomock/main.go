@@ -10,7 +10,6 @@ import (
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"github.com/uptrace/bunrouter"
-	_ "go.uber.org/automaxprocs"
 	"google.golang.org/grpc"
 
 	"github.com/sknv/protomock/internal/config"
