@@ -21,7 +21,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" ./cmd/protomock
 # ----------------------------------------------------------------------------
 
 # Stage 2: Create a minimal runtime image
-FROM alpine:3.21
+FROM alpine:3.22
 
 # Set the working directory
 WORKDIR /app
