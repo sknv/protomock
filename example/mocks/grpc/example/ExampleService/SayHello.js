@@ -13,7 +13,7 @@
 
   return {
     body: {
-      message: `Hello, ${request.body.name}`,
+      message: `Hello, ${request.body.name}, your role is ${request.body.role}`,
       details: {
         code: 1,
         status: "OK"

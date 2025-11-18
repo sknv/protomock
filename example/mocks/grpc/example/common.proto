@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package example;
+
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  ROLE_CUSTOMER = 1;
+  ROLE_ADMIN = 2;
+}

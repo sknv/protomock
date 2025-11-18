@@ -84,11 +84,6 @@ type mockID struct {
 //
 //nolint:funlen // mostly basic operations
 func BuildPackages(ctx context.Context, mocksDir string) (Packages, error) {
-	//nolint:exhaustruct // only required field
-	compiler := &protocompile.Compiler{
-		Resolver: &protocompile.SourceResolver{},
-	}
-
 	var (
 		mocks = make(map[mockID]Mock)
 
@@ -139,8 +134,18 @@ func BuildPackages(ctx context.Context, mocksDir string) (Packages, error) {
 
 			return nil
 		case _protoFileExtension:
+			curDir := filepath.Dir(path)
+			curFile := filepath.Base(path)
+
+			//nolint:exhaustruct // only required field
+			compiler := &protocompile.Compiler{
+				Resolver: &protocompile.SourceResolver{
+					ImportPaths: []string{curDir}, // Look for files in current package only.
+				},
+			}
+
 			// Parse proto definition.
-			protoFile, err := buildProtoFile(ctx, compiler, path)
+			protoFile, err := buildProtoFile(ctx, compiler, curFile)
 			if err != nil {
 				return fmt.Errorf("build proto file: %w", err)
 			}

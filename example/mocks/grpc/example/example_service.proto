@@ -2,12 +2,15 @@ syntax = "proto3";
 
 package example;
 
+import "common.proto";
+
 service ExampleService {
   rpc SayHello (HelloRequest) returns (HelloResponse);
 }
 
 message HelloRequest {
   string name = 1;
+  Role role = 2;
 }
 
 message HelloResponse {
