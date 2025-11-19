@@ -18,6 +18,8 @@ import (
 const (
 	_mockFileExtension  = ".js"
 	_protoFileExtension = ".proto"
+
+	_protoIncludePath = "./include"
 )
 
 type Mock struct {
@@ -137,15 +139,8 @@ func BuildPackages(ctx context.Context, mocksDir string) (Packages, error) {
 			curDir := filepath.Dir(path)
 			curFile := filepath.Base(path)
 
-			//nolint:exhaustruct // only required field
-			compiler := &protocompile.Compiler{
-				Resolver: &protocompile.SourceResolver{
-					ImportPaths: []string{curDir}, // Look for files in current package only.
-				},
-			}
-
 			// Parse proto definition.
-			protoFile, err := buildProtoFile(ctx, compiler, curFile)
+			protoFile, err := buildProtoFile(ctx, []string{_protoIncludePath, curDir}, curFile)
 			if err != nil {
 				return fmt.Errorf("build proto file: %w", err)
 			}
@@ -167,10 +162,17 @@ func BuildPackages(ctx context.Context, mocksDir string) (Packages, error) {
 //nolint:ireturn,nolintlint // contract
 func buildProtoFile(
 	ctx context.Context,
-	compiler *protocompile.Compiler,
-	path string,
+	importPaths []string,
+	file string,
 ) (linker.File, error) {
-	files, err := compiler.Compile(ctx, path)
+	//nolint:exhaustruct // only required field
+	compiler := protocompile.Compiler{
+		Resolver: &protocompile.SourceResolver{
+			ImportPaths: importPaths,
+		},
+	}
+
+	files, err := compiler.Compile(ctx, file)
 	if err != nil {
 		return nil, fmt.Errorf("compile proto file: %w", err)
 	}

@@ -29,6 +29,9 @@ WORKDIR /app
 # Copy the compiled binary from the builder stage
 COPY --from=builder /app/protomock .
 
+# Copy the include folder
+COPY --from=builder /app/include ./include
+
 # Expose the ports the application will run on
 EXPOSE 8000
 EXPOSE 8010
