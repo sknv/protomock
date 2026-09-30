@@ -14,8 +14,8 @@ import (
 const (
 	_mockFileExtension = ".js"
 
-	wildcardPatternToFind   = "__"
-	wildcardPaternToReplace = ":"
+	wildcardPatternToFind    = "__"
+	wildcardPatternToReplace = ":"
 )
 
 type Mock struct {
@@ -86,7 +86,7 @@ func BuildMocks(mocksDir string) (Mocks, error) {
 		httpPath = strings.ReplaceAll( // Replace wildcards for router.
 			httpPath,
 			wildcardPatternToFind,
-			wildcardPaternToReplace,
+			wildcardPatternToReplace,
 		)
 
 		mock := Mock{
