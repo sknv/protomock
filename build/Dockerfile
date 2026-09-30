@@ -1,5 +1,5 @@
 # Stage 1: Build the Go application
-FROM golang:1.25-alpine AS builder
+FROM golang:1.27-alpine AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -21,7 +21,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" ./cmd/protomock
 # ----------------------------------------------------------------------------
 
 # Stage 2: Create a minimal runtime image
-FROM alpine:3.22
+FROM alpine:3.24
 
 # Set the working directory
 WORKDIR /app
