@@ -49,7 +49,7 @@ Similarly you can create `PUT.js`, `DELETE.js` etc in your path. For wildcard pa
 Inside a mock you have access to the following request parameters:
 
 - URL parameters
-- Headers in lower case
+- Header keys in lower case
 - JSON body
 
 ```js
@@ -140,7 +140,7 @@ Now all the gRPC requests to `example.ExampleService.SayHello` method will use `
 
 Inside a mock you have access to the following request parameters:
 
-- Metadata in lower case
+- Metadata keys in lower case
 - Proto body
 
 ```js
