@@ -31,7 +31,7 @@ func NewMockRequestFrom(r bunrouter.Request) (MockRequest, error) {
 
 	headers := make(MockRequestHeaders, len(r.Header))
 	for header := range r.Header {
-		headers[header] = strings.ToLower(r.Header.Get(header))
+		headers[strings.ToLower(header)] = r.Header.Get(header)
 	}
 
 	return MockRequest{
